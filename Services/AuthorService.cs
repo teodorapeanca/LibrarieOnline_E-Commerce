@@ -3,7 +3,7 @@ using LibrarieOnline.Repositories;
 
 namespace LibrarieOnline.Services
 {
-    public class AuthorService
+    public class AuthorService : IAuthorService
     {
         private readonly IAuthorRepository _authorRepository;
 

@@ -3,7 +3,7 @@ using LibrarieOnline.Repositories;
 
 namespace LibrarieOnline.Services
 {
-    public class CategoryService
+    public class CategoryService : ICategoryService
     {
         private readonly ICategoryRepository _categoryRepository;
 

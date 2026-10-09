@@ -1,0 +1,34 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.rsuser
+
+# Fisiere generate la compilare
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+
+# Fisiere temporare
+*.tmp
+*.log
+*.cache
+*.bak
+
+# Setari locale
+.vscode/
+.idea/
+
+# Date sensibile si configuratii locale
+appsettings.Development.json
+.env
+.env.*
+*.pfx
+*.snk
+
+# Baze de date locale
+*.mdf
+*.ldf
+*.db
+*.sqlite

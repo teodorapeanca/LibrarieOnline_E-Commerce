@@ -1,15 +1,17 @@
 ﻿using LibrarieOnline.Models;
 using LibrarieOnline.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibrarieOnline.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class AuthorsController : Controller
     {
-        private readonly AuthorService _authorService;
+        private readonly IAuthorService _authorService;
 
-        public AuthorsController(AuthorService authorService)
+        public AuthorsController(IAuthorService authorService)
         {
             _authorService = authorService;
         }
@@ -101,8 +103,10 @@ namespace LibrarieOnline.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(author);
         }
 
@@ -129,6 +133,7 @@ namespace LibrarieOnline.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _authorService.DeleteAuthor(id);
+
             return RedirectToAction(nameof(Index));
         }
     }

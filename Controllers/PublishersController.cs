@@ -1,28 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using LibrarieOnline.Models;
+using LibrarieOnline.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using LibrarieOnline.Data;
-using LibrarieOnline.Models;
 
 namespace LibrarieOnline.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class PublishersController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IPublisherService _publisherService;
 
-        public PublishersController(ApplicationDbContext context)
+        public PublishersController(IPublisherService publisherService)
         {
-            _context = context;
+            _publisherService = publisherService;
         }
 
         // GET: Publishers
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Publishers.ToListAsync());
+            var publishers = await _publisherService.GetAllPublishers();
+
+            return View(publishers);
         }
 
         // GET: Publishers/Details/5
@@ -33,8 +32,8 @@ namespace LibrarieOnline.Controllers
                 return NotFound();
             }
 
-            var publisher = await _context.Publishers
-                .FirstOrDefaultAsync(m => m.PublisherId == id);
+            var publisher = await _publisherService.GetPublisherById(id.Value);
+
             if (publisher == null)
             {
                 return NotFound();
@@ -50,18 +49,17 @@ namespace LibrarieOnline.Controllers
         }
 
         // POST: Publishers/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("PublisherId,Name,Country")] Publisher publisher)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(publisher);
-                await _context.SaveChangesAsync();
+                await _publisherService.AddPublisher(publisher);
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(publisher);
         }
 
@@ -73,17 +71,17 @@ namespace LibrarieOnline.Controllers
                 return NotFound();
             }
 
-            var publisher = await _context.Publishers.FindAsync(id);
+            var publisher = await _publisherService.GetPublisherById(id.Value);
+
             if (publisher == null)
             {
                 return NotFound();
             }
+
             return View(publisher);
         }
 
         // POST: Publishers/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("PublisherId,Name,Country")] Publisher publisher)
@@ -97,22 +95,21 @@ namespace LibrarieOnline.Controllers
             {
                 try
                 {
-                    _context.Update(publisher);
-                    await _context.SaveChangesAsync();
+                    await _publisherService.UpdatePublisher(publisher);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PublisherExists(publisher.PublisherId))
+                    if (!await _publisherService.PublisherExists(publisher.PublisherId))
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(publisher);
         }
 
@@ -124,8 +121,8 @@ namespace LibrarieOnline.Controllers
                 return NotFound();
             }
 
-            var publisher = await _context.Publishers
-                .FirstOrDefaultAsync(m => m.PublisherId == id);
+            var publisher = await _publisherService.GetPublisherById(id.Value);
+
             if (publisher == null)
             {
                 return NotFound();
@@ -139,19 +136,9 @@ namespace LibrarieOnline.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var publisher = await _context.Publishers.FindAsync(id);
-            if (publisher != null)
-            {
-                _context.Publishers.Remove(publisher);
-            }
+            await _publisherService.DeletePublisher(id);
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool PublisherExists(int id)
-        {
-            return _context.Publishers.Any(e => e.PublisherId == id);
         }
     }
 }

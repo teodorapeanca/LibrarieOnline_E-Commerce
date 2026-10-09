@@ -3,7 +3,7 @@ using LibrarieOnline.Repositories;
 
 namespace LibrarieOnline.Services
 {
-    public class BookService
+    public class BookService : IBookService
     {
         private readonly IBookRepository _bookRepository;
 
@@ -60,10 +60,16 @@ namespace LibrarieOnline.Services
         public async Task AddToCart(int id)
         {
             var book = await _bookRepository.GetById(id);
+
             if (book != null)
             {
                 await _bookRepository.AddOrderWithItem(book);
             }
+        }
+
+        public async Task<List<Book>> SearchBooks(string searchTerm)
+        {
+            return await _bookRepository.SearchBooks(searchTerm);
         }
     }
 }

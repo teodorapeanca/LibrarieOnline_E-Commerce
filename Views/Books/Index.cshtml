@@ -2,59 +2,110 @@
 
 @{
     ViewData["Title"] = "Catalog";
+
+    var images = new Dictionary<string, string>
+    {
+        { "Ion", "ion.jpg" },
+        { "Morometii", "Morometii.jpg" },
+        { "Enigma Otiliei", "enigmaOtiliei.jpg" },
+        { "Patul lui Procust", "patulluiprocust.jpg" },
+        { "Amintiri din copilărie", "amintiridincopilarie.jpg" },
+        { "Orbitor", "orbitor.jpg" },
+        { "Marile speranțe", "marilesperante.jpg" },
+        { "Jane Eyre", "janeeyre.jpg" },
+        { "Numele trandafirului", "numeletrandafirului.jpg" },
+        { "Poezii", "poeziieminescu.jpg" },
+        { "Alchimistul", "alchimistul.jpg" },
+        { "De ce iubim femeile", "deceiubimfemeile.jpg" },
+        { "Mitul lui Sisif", "mitulluisisif.jpg" },
+        { "Ultima noapte de dragoste, întâia noapte de război", "ultimanoapte.jpg" },
+        { "Mizerabilii", "mizerabilii.jpg" },
+        { "Don Quijote", "donquijote.jpg" },
+        { "Război și pace", "razboisipace.jpg" },
+        { "Procesul", "procesul.jpg" },
+        { "Harry Potter și piatra filozofală", "harrypottersipiatrafilozofala.jpg" },
+        { "Străinul", "strainul.jpg" },
+        { "Dragostea în vremea holerei", "dragosteainvremeaholerei.jpg" },
+        { "Pe aripile vântului", "pearipilevantului.jpg" },
+        { "Desculț", "descult.jpg" },
+        { "Apus de soare", "apusdesoare.jpg" },
+        { "Proiecte de trecut", "proiectedetrecut.jpg" },
+        { "Papillon", "papillon.jpg" },
+        { "Romeo și Julieta", "romeosijulieta.jpg" },
+        { "Crima din Orient Express", "crimadinorientexpress.jpg" },
+        { "Câinele grădinarului", "cainelegradinarului.jpg" },
+        { "Suflete moarte", "sufletemoarte.jpg" },
+        { "Umbra vântului", "umbravantului.jpg" },
+        { "Portretul lui Dorian Gray", "portretulluidoriangray.jpg" },
+        { "Un veac de singurătate", "unveacdesinguratate.jpg" },
+        { "Marele Gatsby", "marelegatsby.jpg" },
+        { "Contele de Monte Cristo", "conteledecristomonte.jpg" },
+        { "Germinal", "germinal.jpg" },
+        { "În căutarea timpului pierdut", "incautareatimpuluipierdut.jpg" },
+        { "Greața", "greata.jpg" }
+    };
 }
 
-<h1>Catalog</h1>
+<h1 class="mb-4">Catalog</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary mb-4">+ Adaugă carte</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Price)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Author)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Category)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Publisher)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Author.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Publisher.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.BookId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.BookId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.BookId">Delete</a>
-                <a asp-action="AddToCart" asp-route-id="@item.BookId">Add to Cart</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        var imageFile = images.ContainsKey(item.Title)
+            ? images[item.Title]
+            : "default.jpg";
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm book-card">
+
+                <img src="/images/books/@imageFile"
+                     class="card-img-top"
+                     style="height: 200px; object-fit: cover;" />
+
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">@item.Title</h5>
+
+                    <p class="card-text mb-1">
+                        <strong>Autor:</strong> @item.Author?.Name
+                    </p>
+
+                    <p class="card-text mb-1">
+                        <strong>Categorie:</strong> @item.Category?.Name
+                    </p>
+
+                    <p class="card-text mb-1">
+                        <strong>Editură:</strong> @item.Publisher?.Name
+                    </p>
+
+                    <p class="card-text mt-3">
+                        <strong>Preț:</strong> @item.Price.ToString("0.00") RON
+                    </p>
+                </div>
+
+                <div class="card-footer bg-white border-0">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a asp-action="Edit" asp-route-id="@item.BookId" class="btn btn-sm btn-warning">Edit</a>
+
+                        <a asp-action="Details" asp-route-id="@item.BookId" class="btn btn-sm btn-info text-white">Details</a>
+
+                        <a asp-action="Delete" asp-route-id="@item.BookId" class="btn btn-sm btn-danger">Delete</a>
+
+                        <a asp-action="AddToCart" asp-route-id="@item.BookId" class="btn btn-sm btn-success">Add</a>
+
+                        <a asp-controller="Favorites"
+                               asp-action="Add"
+                               asp-route-id="@item.BookId"
+                               class="btn btn-sm btn-outline-danger">
+                            ❤
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    }
+</div>

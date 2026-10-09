@@ -1,0 +1,63 @@
+﻿@model IEnumerable<LibrarieOnline.Models.Favorite>
+
+@{
+    ViewData["Title"] = "Favorite";
+}
+
+<h1 class="mb-4">❤️ Favorite</h1>
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4 mb-4">
+
+            <div class="card h-100 shadow-sm">
+
+                <img src="/images/books/default.jpg"
+                     class="card-img-top"
+                     style="height:200px; object-fit:cover;" />
+
+                <div class="card-body">
+
+                    <h5 class="card-title fw-bold">
+                        @item.Book.Title
+                    </h5>
+
+                    <p>
+                        <strong>Autor:</strong>
+                        @item.Book.Author?.Name
+                    </p>
+
+                    <p>
+                        <strong>Categorie:</strong>
+                        @item.Book.Category?.Name
+                    </p>
+
+                    <p>
+                        <strong>Editură:</strong>
+                        @item.Book.Publisher?.Name
+                    </p>
+
+                    <p>
+                        <strong>Preț:</strong>
+                        @item.Book.Price.ToString("0.00") RON
+                    </p>
+
+                </div>
+
+                <div class="card-footer bg-white border-0">
+
+                    <a asp-controller="Favorites"
+                           asp-action="Remove"
+                           asp-route-id="@item.FavoriteId"
+                           class="btn btn-danger">
+                        Șterge din favorite
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+</div>

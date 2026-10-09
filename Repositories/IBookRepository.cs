@@ -9,7 +9,7 @@ namespace LibrarieOnline.Repositories
         Task Add(Book book);
         Task Update(Book book);
         Task Delete(int id);
-
+        Task<List<Book>> SearchBooks(string searchTerm);
         Task<bool> Exists(int id);
 
         Task<List<Author>> GetAuthors();

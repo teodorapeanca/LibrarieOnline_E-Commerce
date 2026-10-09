@@ -1,15 +1,17 @@
 ﻿using LibrarieOnline.Models;
 using LibrarieOnline.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibrarieOnline.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CategoriesController : Controller
     {
-        private readonly CategoryService _categoryService;
+        private readonly ICategoryService _categoryService;
 
-        public CategoriesController(CategoryService categoryService)
+        public CategoriesController(ICategoryService categoryService)
         {
             _categoryService = categoryService;
         }
@@ -30,6 +32,7 @@ namespace LibrarieOnline.Controllers
             }
 
             var category = await _categoryService.GetCategoryById(id.Value);
+
             if (category == null)
             {
                 return NotFound();
@@ -54,6 +57,7 @@ namespace LibrarieOnline.Controllers
                 await _categoryService.AddCategory(category);
                 return RedirectToAction(nameof(Index));
             }
+
             return View(category);
         }
 
@@ -66,6 +70,7 @@ namespace LibrarieOnline.Controllers
             }
 
             var category = await _categoryService.GetCategoryById(id.Value);
+
             if (category == null)
             {
                 return NotFound();
@@ -101,8 +106,10 @@ namespace LibrarieOnline.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(category);
         }
 
@@ -115,6 +122,7 @@ namespace LibrarieOnline.Controllers
             }
 
             var category = await _categoryService.GetCategoryById(id.Value);
+
             if (category == null)
             {
                 return NotFound();
@@ -129,6 +137,7 @@ namespace LibrarieOnline.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _categoryService.DeleteCategory(id);
+
             return RedirectToAction(nameof(Index));
         }
     }

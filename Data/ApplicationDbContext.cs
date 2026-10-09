@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LibrarieOnline.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -12,10 +12,19 @@ namespace LibrarieOnline.Data
         }
 
         public DbSet<Author> Authors { get; set; }
+
         public DbSet<Category> Categories { get; set; }
+
         public DbSet<Publisher> Publishers { get; set; }
+
+        public DbSet<Review> Reviews { get; set; }
+
         public DbSet<Book> Books { get; set; }
+
         public DbSet<Order> Orders { get; set; }
+
         public DbSet<OrderItem> OrderItems { get; set; }
+
+        public DbSet<Favorite> Favorites { get; set; }
     }
 }

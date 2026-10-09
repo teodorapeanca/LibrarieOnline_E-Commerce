@@ -4,16 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LibrarieOnline.Repositories
 {
-    public class BookRepository : IBookRepository
+    public class BookRepository : GenericRepository<Book>, IBookRepository
     {
-        private readonly ApplicationDbContext _context;
-
-        public BookRepository(ApplicationDbContext context)
+        public BookRepository(ApplicationDbContext context) : base(context)
         {
-            _context = context;
         }
 
-        public async Task<List<Book>> GetAll()
+        public new async Task<List<Book>> GetAll()
         {
             return await _context.Books
                 .Include(b => b.Author)
@@ -22,40 +19,14 @@ namespace LibrarieOnline.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Book?> GetById(int id)
+        public new async Task<Book?> GetById(int id)
         {
             return await _context.Books
                 .Include(b => b.Author)
                 .Include(b => b.Category)
                 .Include(b => b.Publisher)
+                .Include(b => b.Reviews)
                 .FirstOrDefaultAsync(b => b.BookId == id);
-        }
-
-        public async Task Add(Book book)
-        {
-            _context.Books.Add(book);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task Update(Book book)
-        {
-            _context.Books.Update(book);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task Delete(int id)
-        {
-            var book = await _context.Books.FindAsync(id);
-            if (book != null)
-            {
-                _context.Books.Remove(book);
-                await _context.SaveChangesAsync();
-            }
-        }
-
-        public async Task<bool> Exists(int id)
-        {
-            return await _context.Books.AnyAsync(e => e.BookId == id);
         }
 
         public async Task<List<Author>> GetAuthors()
@@ -94,6 +65,19 @@ namespace LibrarieOnline.Repositories
 
             _context.OrderItems.Add(orderItem);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Book>> SearchBooks(string searchTerm)
+        {
+            return await _context.Books
+                .Include(b => b.Author)
+                .Include(b => b.Category)
+                .Include(b => b.Publisher)
+                .Where(b => b.Title.Contains(searchTerm)
+                         || b.Author.Name.Contains(searchTerm)
+                         || b.Category.Name.Contains(searchTerm)
+                         || b.Publisher.Name.Contains(searchTerm))
+                .ToListAsync();
         }
     }
 }

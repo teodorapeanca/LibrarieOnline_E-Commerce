@@ -60,3 +60,64 @@
     <a asp-action="Edit" asp-route-id="@Model?.BookId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+<hr />
+
+<h3>Review-uri</h3>
+
+@if (Model.Reviews != null && Model.Reviews.Any())
+{
+    @foreach (var review in Model.Reviews)
+    {
+        <div class="border p-3 mb-3 rounded">
+            <h5>@review.UserName</h5>
+
+            <p>
+                <strong>Rating:</strong> @review.Rating / 5
+            </p>
+
+            <p>@review.Comment</p>
+        </div>
+    }
+}
+else
+{
+    <p>Nu există review-uri pentru această carte.</p>
+}
+
+<hr />
+@if (User.IsInRole("User"))
+{
+<h3>Adaugă review</h3>
+
+<form asp-controller="Reviews" asp-action="Add" method="post">
+
+    <input type="hidden" name="BookId" value="@Model.BookId" />
+
+    <div class="mb-3">
+        <label>Nume</label>
+        <input type="text"
+               name="UserName"
+               class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Comentariu</label>
+        <textarea name="Comment"
+                  class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label>Rating</label>
+        <input type="number"
+               name="Rating"
+               min="1"
+               max="5"
+               class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Adaugă review
+    </button>
+
+    </form>
+}
