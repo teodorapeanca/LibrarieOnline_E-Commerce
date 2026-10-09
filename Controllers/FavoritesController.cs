@@ -1,10 +1,12 @@
-﻿using LibrarieOnline.Data;
+﻿using Microsoft.AspNetCore.Authorization;
+using LibrarieOnline.Data;
 using LibrarieOnline.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibrarieOnline.Controllers
 {
+    [Authorize(Roles = "User")]
     public class FavoritesController : Controller
     {
         private readonly ApplicationDbContext _context;
