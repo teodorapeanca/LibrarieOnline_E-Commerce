@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace LibrarieOnline.Models
 {
@@ -15,5 +17,8 @@ namespace LibrarieOnline.Models
         [StringLength(100, ErrorMessage = "Naționalitatea nu poate depăși 100 de caractere.")]
         [Display(Name = "Naționalitate")]
         public string? Nationality { get; set; }
+
+        // Cărțile scrise de acest autor
+        public ICollection<Book> Books { get; set; } = new List<Book>();
     }
 }

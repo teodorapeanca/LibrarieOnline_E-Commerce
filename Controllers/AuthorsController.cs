@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LibrarieOnline.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,User")]
     public class AuthorsController : Controller
     {
         private readonly IAuthorService _authorService;
@@ -32,6 +32,7 @@ namespace LibrarieOnline.Controllers
             }
 
             var author = await _authorService.GetAuthorById(id.Value);
+
             if (author == null)
             {
                 return NotFound();
@@ -41,6 +42,7 @@ namespace LibrarieOnline.Controllers
         }
 
         // GET: Authors/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -49,17 +51,21 @@ namespace LibrarieOnline.Controllers
         // POST: Authors/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AuthorId,Name,Nationality")] Author author)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create(
+            [Bind("AuthorId,Name,Nationality")] Author author)
         {
             if (ModelState.IsValid)
             {
                 await _authorService.AddAuthor(author);
                 return RedirectToAction(nameof(Index));
             }
+
             return View(author);
         }
 
         // GET: Authors/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -68,6 +74,7 @@ namespace LibrarieOnline.Controllers
             }
 
             var author = await _authorService.GetAuthorById(id.Value);
+
             if (author == null)
             {
                 return NotFound();
@@ -79,7 +86,10 @@ namespace LibrarieOnline.Controllers
         // POST: Authors/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AuthorId,Name,Nationality")] Author author)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Edit(
+            int id,
+            [Bind("AuthorId,Name,Nationality")] Author author)
         {
             if (id != author.AuthorId)
             {
@@ -98,10 +108,8 @@ namespace LibrarieOnline.Controllers
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
 
                 return RedirectToAction(nameof(Index));
@@ -111,6 +119,7 @@ namespace LibrarieOnline.Controllers
         }
 
         // GET: Authors/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -119,6 +128,7 @@ namespace LibrarieOnline.Controllers
             }
 
             var author = await _authorService.GetAuthorById(id.Value);
+
             if (author == null)
             {
                 return NotFound();
@@ -130,6 +140,7 @@ namespace LibrarieOnline.Controllers
         // POST: Authors/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _authorService.DeleteAuthor(id);

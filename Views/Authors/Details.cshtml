@@ -1,30 +1,62 @@
 ﻿@model LibrarieOnline.Models.Author
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Cărțile autorului";
 }
 
-<h1>Details</h1>
+<h1>Cărțile autorului: @Model.Name</h1>
 
-<div>
-    <h4>Author</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nationality)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nationality)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.AuthorId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<hr />
+
+<p>
+    <strong>Naționalitate:</strong> @Model.Nationality
+</p>
+
+<h3>Cărți scrise de acest autor</h3>
+
+@if (Model.Books != null && Model.Books.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Titlu carte</th>
+                <th>Acțiuni</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var book in Model.Books)
+            {
+                <tr>
+                    <td>@book.Title</td>
+                    <td>
+                        <a asp-controller="Catalog"
+                           asp-action="Detalii"
+                           asp-route-id="@book.BookId"
+                           class="btn btn-sm btn-info text-white">
+                            Vezi cartea
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Nu există cărți înregistrate pentru acest autor.</p>
+}
+
+<div class="mt-3">
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Edit"
+           asp-route-id="@Model.AuthorId"
+           class="btn btn-warning">
+            Edit
+        </a>
+    }
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Înapoi la autori
+    </a>
 </div>

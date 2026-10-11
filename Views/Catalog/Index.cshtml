@@ -1,5 +1,4 @@
-﻿
-@model IEnumerable<LibrarieOnline.Models.Book>
+﻿@model IEnumerable<LibrarieOnline.Models.Book>
 
 @{
     ViewData["Title"] = "Catalog";
@@ -18,12 +17,16 @@
     </p>
 }
 
+<div id="inceput-catalog"></div>
+
 <div class="row">
     @foreach (var item in Model)
     {
         var imagePath = LibrarieOnline.Services.BookImageHelper.GetImagePath(item.Title);
 
-        <div class="col-md-4 mb-4">
+        <div class="col-md-4 mb-4 carte-catalog"
+             id="carte-@item.BookId">
+
             <div class="card h-100 shadow-sm">
 
                 <img src="@imagePath"
@@ -87,28 +90,31 @@
                             Details
                         </a>
 
-                       @if (User.IsInRole("User"))
-{
-    <a asp-controller="Cos"
-       asp-action="AddToCart"
-       asp-route-id="@item.BookId"
-       class="btn btn-sm btn-success">
-        🛒 Adaugă în coș
-    </a>
+                        @if (User.IsInRole("User"))
+                        {
+                            <a asp-controller="Cos"
+                               asp-action="AddToCart"
+                               asp-route-id="@item.BookId"
+                               class="btn btn-sm btn-success">
+                                🛒 Adaugă în coș
+                            </a>
 
-    <a asp-controller="Favorites"
-       asp-action="Add"
-       asp-route-id="@item.BookId"
-       class="btn btn-sm btn-outline-danger">
-        ❤️ Adaugă la favorite
-    </a>
-}
+                            <a asp-controller="Favorites"
+                               asp-action="Add"
+                               asp-route-id="@item.BookId"
+                               class="btn btn-sm btn-outline-danger">
+                                ❤️ Adaugă la favorite
+                            </a>
+                        }
 
                     </div>
-
                 </div>
-
             </div>
         </div>
     }
 </div>
+
+<a href="#inceput-catalog"
+   class="btn btn-warning inapoi-sus">
+    ↑ Înapoi la începutul catalogului
+</a>

@@ -1,4 +1,5 @@
-﻿using LibrarieOnline.Models;
+﻿
+using LibrarieOnline.Models;
 
 namespace LibrarieOnline.Repositories
 {
@@ -6,6 +7,10 @@ namespace LibrarieOnline.Repositories
     {
         Task<List<Author>> GetAll();
         Task<Author?> GetById(int id);
+
+        // Obține autorul împreună cu toate cărțile sale
+        Task<Author?> GetAuthorWithBooks(int id);
+
         Task Add(Author author);
         Task Update(Author author);
         Task Delete(int id);

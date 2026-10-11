@@ -1,4 +1,5 @@
-﻿using LibrarieOnline.Models;
+﻿
+using LibrarieOnline.Models;
 using LibrarieOnline.Repositories;
 
 namespace LibrarieOnline.Services
@@ -19,7 +20,7 @@ namespace LibrarieOnline.Services
 
         public async Task<Author?> GetAuthorById(int id)
         {
-            return await _authorRepository.GetById(id);
+            return await _authorRepository.GetAuthorWithBooks(id);
         }
 
         public async Task AddAuthor(Author author)
