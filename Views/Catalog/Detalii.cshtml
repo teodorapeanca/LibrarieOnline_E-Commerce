@@ -1,10 +1,31 @@
-﻿@{
-    ViewData["Title"] = "Detalii Carte";
+﻿@model LibrarieOnline.Models.Book
+
+@{
+    ViewData["Title"] = "Detalii carte";
 }
 
-<h1>Detalii Carte</h1>
-<p>Pagină demo pentru detalii carte.</p>
+<h2>@Model.Title</h2>
 
-<a class="btn btn-secondary" asp-controller="Catalog" asp-action="Index">
-    Înapoi la Catalog
+<hr />
+
+<p><strong>Preț:</strong> @Model.Price lei</p>
+
+<h4>Descriere</h4>
+<p style="white-space: pre-line;">
+    @(string.IsNullOrWhiteSpace(Model.Description)
+        ? "Nu există încă o descriere pentru această carte."
+        : Model.Description)
+</p>
+
+<p>
+    <strong>ISBN:</strong>
+    @(string.IsNullOrWhiteSpace(Model.ISBN)
+        ? "ISBN indisponibil"
+        : Model.ISBN)
+</p>
+
+<a asp-controller="Catalog"
+   asp-action="Index"
+   class="btn btn-secondary">
+    Înapoi la catalog
 </a>

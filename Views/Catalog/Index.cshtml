@@ -1,4 +1,5 @@
-﻿@model IEnumerable<LibrarieOnline.Models.Book>
+﻿
+@model IEnumerable<LibrarieOnline.Models.Book>
 
 @{
     ViewData["Title"] = "Catalog";
@@ -10,8 +11,8 @@
 {
     <p>
         <a asp-controller="Books"
-               asp-action="Create"
-               class="btn btn-primary mb-4">
+           asp-action="Create"
+           class="btn btn-primary mb-4">
             + Adaugă carte
         </a>
     </p>
@@ -20,70 +21,21 @@
 <div class="row">
     @foreach (var item in Model)
     {
+        var imagePath = LibrarieOnline.Services.BookImageHelper.GetImagePath(item.Title);
+
         <div class="col-md-4 mb-4">
             <div class="card h-100 shadow-sm">
 
-                @{
-                    var imageMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-                    {
-                        ["Ion"] = "ion.jpg",
-                        ["Morometii"] = "Morometii.jpg",
-                        ["Moromeții"] = "Morometii.jpg",
-                        ["Enigma Otiliei"] = "enigmaOtiliei.jpg",
-                        ["Patul lui Procust"] = "patulluiprocust.jpg",
-                        ["Poezii"] = "poeziieminescu.jpg",
-                        ["De ce iubim femeile"] = "deceiubimfemeile.jpg",
-                        ["Don Quijote"] = "donquijote.jpg",
-                        ["Război și pace"] = "razboisipace.jpg",
-                        ["Procesul"] = "procesul.jpg",
-                        ["Harry Potter și piatra filozofală"] = "harrypottersipiatrafilozofala.jpg",
-                        ["Dragostea în vremea holerei"] = "dragosteainvremeaholerei.jpg",
-                        ["Un veac de singurătate"] = "unveacdesinguratate.jpg",
-                        ["Marele Gatsby"] = "marelegatsby.jpg",
-                        ["Amintiri din copilărie"] = "amintiridincopilarie.jpg",
-                        ["Orbitor"] = "orbitor.jpg",
-                        ["Marile speranțe"] = "marelegatsby.jpg",
-                        ["Jane Eyre"] = "janeeyre.jpg",
-                        ["Numele trandafirului"] = "numeletrandafirului.jpg",
-                        ["Alchimistul"] = "alchimistul.jpg",
-                        ["Mitul lui Sisif"] = "mitulluisisif.jpg",
-                        ["Mizerabilii"] = "mizerabilii.jpg",
-                        ["Contele de Monte Cristo"] = "conteledecristomonte.jpg",
-                        ["Străinul"] = "strainul.jpg",
-                        ["Ultima noapte de dragoste, întâia noapte de război"] = "ultimanoapte.jpg",
-                        ["Germinal"] = "germinal.jpg",
-                        ["În căutarea timpului pierdut"] = "incautareatimpuluipierdut.jpg",
-                        ["Greata"] = "greata.jpg",
-                        ["Greața"] = "greata.jpg",
-                        ["Romeo și Julieta"] = "romeosijulieta.jpg",
-                        ["Crima din Orient Express"] = "crimadinorientexpress.jpg",
-                        ["Câinele grădinarului"] = "cainelegradinarului.jpg",
-                        ["Suflete moarte"] = "sufletemoarte.jpg",
-                        ["Umbra vântului"] = "umbravantului.jpg",
-                        ["Portretul lui Dorian Gray"] = "portretulluidoriangray.jpg",
-                        ["Pe aripile vântului"] = "pearipilevantului.jpg",
-                        ["Desculț"] = "descult.jpg",
-                        ["Apus de soare"] = "apusdesoare.jpg",
-                        ["Proiecte de trecut"] = "proiectedetrecut.jpg",
-                        ["Papillon"] = "papillon.jpg",
-                    };
-
-                    imageMap.TryGetValue(item.Title, out var imageFile);
-                }
-
-                @if (!string.IsNullOrEmpty(imageFile))
-                {
-                    <img src="/images/books/@imageFile"
-                         class="card-img-top"
-                         style="height:200px; object-fit:cover;"
-                         alt="@item.Title" />
-                }
+                <img src="@imagePath"
+                     class="card-img-top"
+                     style="height:200px; object-fit:cover;"
+                     alt="Coperta cărții @item.Title" />
 
                 <div class="card-body">
 
-                    <h4 class="fw-bold">
+                    <h5 class="card-title fw-bold">
                         @item.Title
-                    </h4>
+                    </h5>
 
                     <p>
                         <strong>Autor:</strong>
@@ -100,7 +52,7 @@
                         @item.Publisher?.Name
                     </p>
 
-                    <p class="mt-3">
+                    <p>
                         <strong>Preț:</strong>
                         @item.Price.ToString("0.00") RON
                     </p>
@@ -108,50 +60,52 @@
                 </div>
 
                 <div class="card-footer bg-white border-0">
-                    <div class="d-flex gap-2 flex-wrap">
+
+                    <div class="d-flex flex-wrap gap-2">
 
                         @if (User.IsInRole("Admin"))
                         {
                             <a asp-controller="Books"
-                                   asp-action="Edit"
-                                   asp-route-id="@item.BookId"
-                                   class="btn btn-sm btn-warning">
+                               asp-action="Edit"
+                               asp-route-id="@item.BookId"
+                               class="btn btn-sm btn-warning">
                                 Edit
                             </a>
 
                             <a asp-controller="Books"
-                                   asp-action="Delete"
-                                   asp-route-id="@item.BookId"
-                                   class="btn btn-sm btn-danger">
+                               asp-action="Delete"
+                               asp-route-id="@item.BookId"
+                               class="btn btn-sm btn-danger">
                                 Delete
                             </a>
                         }
 
-                        <a asp-controller="Books"
-                               asp-action="Details"
-                               asp-route-id="@item.BookId"
-                               class="btn btn-sm btn-info text-white">
+                        <a asp-controller="Catalog"
+                           asp-action="Detalii"
+                           asp-route-id="@item.BookId"
+                           class="btn btn-sm btn-info text-white">
                             Details
                         </a>
 
-                        @if (User.IsInRole("User"))
-                        {
-                            <a asp-controller="Cos"
-                                   asp-action="AddToCart"
-                                   asp-route-id="@item.BookId"
-                                   class="btn btn-sm btn-success">
-                                Add
-                            </a>
+                       @if (User.IsInRole("User"))
+{
+    <a asp-controller="Cos"
+       asp-action="AddToCart"
+       asp-route-id="@item.BookId"
+       class="btn btn-sm btn-success">
+        🛒 Adaugă în coș
+    </a>
 
-                            <a asp-controller="Favorites"
-                                   asp-action="Add"
-                                   asp-route-id="@item.BookId"
-                                   class="btn btn-sm btn-outline-danger">
-                                ❤ Ador
-                            </a>
-                        }
+    <a asp-controller="Favorites"
+       asp-action="Add"
+       asp-route-id="@item.BookId"
+       class="btn btn-sm btn-outline-danger">
+        ❤️ Adaugă la favorite
+    </a>
+}
 
                     </div>
+
                 </div>
 
             </div>

@@ -1,31 +1,66 @@
-﻿@model LibrarieOnline.Models.Publisher
+﻿
+@model LibrarieOnline.Models.Publisher
 
 @{
-    ViewData["Title"] = "Details";
-   
+    ViewData["Title"] = "Cărțile editurii " + Model.Name;
+
+    var books = ViewBag.PublisherBooks as List<LibrarieOnline.Models.Book>
+                ?? new List<LibrarieOnline.Models.Book>();
 }
 
-<h1>Details</h1>
+<h1>Cărțile editurii: @Model.Name</h1>
 
-<div>
-    <h4>Publisher</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Country)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Country)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.PublisherId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+<p>
+    <strong>Țara:</strong> @Model.Country
+</p>
+
+<hr />
+
+@if (books.Any())
+{
+    <div class="row">
+        @foreach (var book in books)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+
+                        <h5 class="card-title">
+                            @book.Title
+                        </h5>
+
+                        <p class="card-text">
+                            <strong>Preț:</strong>
+                            @book.Price.ToString("0.00") lei
+                        </p>
+
+                        @if (!string.IsNullOrWhiteSpace(book.Description))
+                        {
+                            <p class="card-text">
+                                @book.Description
+                            </p>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(book.ISBN))
+                        {
+                            <p class="card-text">
+                                <strong>ISBN:</strong> @book.ISBN
+                            </p>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        Momentan nu există cărți asociate acestei edituri.
+    </div>
+}
+
+<a asp-action="Index" class="btn btn-secondary mt-3">
+    Înapoi la edituri
+</a>

@@ -19,9 +19,23 @@ namespace LibrarieOnline.Controllers
             return View(books);
         }
 
-        public IActionResult Detalii()
+
+        public async Task<IActionResult> Detalii(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var book = await _bookService.GetBookById(id.Value);
+
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            return View(book);
         }
+
     }
 }

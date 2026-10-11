@@ -1,4 +1,5 @@
-﻿@model IEnumerable<LibrarieOnline.Models.Favorite>
+﻿
+@model IEnumerable<LibrarieOnline.Models.Favorite>
 
 @{
     ViewData["Title"] = "Favorite";
@@ -6,58 +7,68 @@
 
 <h1 class="mb-4">❤️ Favorite</h1>
 
-<div class="row">
-    @foreach (var item in Model)
-    {
-        <div class="col-md-4 mb-4">
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        Nu ai adăugat încă nicio carte la favorite.
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            var imagePath = LibrarieOnline.Services.BookImageHelper.GetImagePath(item.Book.Title);
 
-            <div class="card h-100 shadow-sm">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
 
-                <img src="/images/books/default.jpg"
-                     class="card-img-top"
-                     style="height:200px; object-fit:cover;" />
+                    <img src="@imagePath"
+                         class="card-img-top"
+                         style="height:200px; object-fit:cover;"
+                         alt="Coperta cărții @item.Book.Title" />
 
-                <div class="card-body">
+                    <div class="card-body">
 
-                    <h5 class="card-title fw-bold">
-                        @item.Book.Title
-                    </h5>
+                        <h5 class="card-title fw-bold">
+                            @item.Book.Title
+                        </h5>
 
-                    <p>
-                        <strong>Autor:</strong>
-                        @item.Book.Author?.Name
-                    </p>
+                        <p>
+                            <strong>Autor:</strong>
+                            @item.Book.Author?.Name
+                        </p>
 
-                    <p>
-                        <strong>Categorie:</strong>
-                        @item.Book.Category?.Name
-                    </p>
+                        <p>
+                            <strong>Categorie:</strong>
+                            @item.Book.Category?.Name
+                        </p>
 
-                    <p>
-                        <strong>Editură:</strong>
-                        @item.Book.Publisher?.Name
-                    </p>
+                        <p>
+                            <strong>Editură:</strong>
+                            @item.Book.Publisher?.Name
+                        </p>
 
-                    <p>
-                        <strong>Preț:</strong>
-                        @item.Book.Price.ToString("0.00") RON
-                    </p>
+                        <p>
+                            <strong>Preț:</strong>
+                            @item.Book.Price.ToString("0.00") RON
+                        </p>
 
-                </div>
+                    </div>
 
-                <div class="card-footer bg-white border-0">
+                    <div class="card-footer bg-white border-0">
 
-                    <a asp-controller="Favorites"
+                        <a asp-controller="Favorites"
                            asp-action="Remove"
                            asp-route-id="@item.FavoriteId"
                            class="btn btn-danger">
-                        Șterge din favorite
-                    </a>
+                            Șterge din favorite
+                        </a>
+
+                    </div>
 
                 </div>
-
             </div>
-
-        </div>
-    }
-</div>
+        }
+    </div>
+}

@@ -51,7 +51,7 @@ namespace LibrarieOnline.Controllers
             ViewBag.Categories = new SelectList(await _bookService.GetCategories(), "CategoryId", "Name");
             ViewBag.Publishers = new SelectList(await _bookService.GetPublishers(), "PublisherId", "Name");
 
-            return View();
+            return View(new Book());
         }
 
         [HttpPost]

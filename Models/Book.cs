@@ -29,6 +29,12 @@ namespace LibrarieOnline.Models
         [Required(ErrorMessage = "Editura este obligatorie.")]
         [Display(Name = "Editură")]
         public int PublisherId { get; set; }
+        [Display(Name = "Descriere")]
+        public string? Description { get; set; }
+
+        [Display(Name = "ISBN")]
+        [StringLength(13, MinimumLength = 10)]
+        public string? ISBN { get; set; }
 
         public Author? Author { get; set; }
         public Category? Category { get; set; }

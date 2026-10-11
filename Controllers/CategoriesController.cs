@@ -1,4 +1,5 @@
-﻿using LibrarieOnline.Models;
+﻿
+using LibrarieOnline.Models;
 using LibrarieOnline.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,20 +11,26 @@ namespace LibrarieOnline.Controllers
     public class CategoriesController : Controller
     {
         private readonly ICategoryService _categoryService;
+        private readonly IBookService _bookService;
 
-        public CategoriesController(ICategoryService categoryService)
+        public CategoriesController(
+            ICategoryService categoryService,
+            IBookService bookService)
         {
             _categoryService = categoryService;
+            _bookService = bookService;
         }
 
-        // GET: Categories
+        // Toata lumea poate vedea categoriile
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var categories = await _categoryService.GetAllCategories();
             return View(categories);
         }
 
-        // GET: Categories/Details/5
+        // Toata lumea poate vedea cartile unei categorii
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -38,19 +45,27 @@ namespace LibrarieOnline.Controllers
                 return NotFound();
             }
 
+            var allBooks = await _bookService.GetAllBooks();
+
+            var categoryBooks = allBooks
+                .Where(b => b.CategoryId == id.Value)
+                .ToList();
+
+            ViewBag.CategoryBooks = categoryBooks;
+
             return View(category);
         }
 
-        // GET: Categories/Create
+        // Doar Admin poate crea categorii
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Categories/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CategoryId,Name")] Category category)
+        public async Task<IActionResult> Create(
+            [Bind("CategoryId,Name")] Category category)
         {
             if (ModelState.IsValid)
             {
@@ -61,7 +76,7 @@ namespace LibrarieOnline.Controllers
             return View(category);
         }
 
-        // GET: Categories/Edit/5
+        // Doar Admin poate edita categorii
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -79,10 +94,11 @@ namespace LibrarieOnline.Controllers
             return View(category);
         }
 
-        // POST: Categories/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CategoryId,Name")] Category category)
+        public async Task<IActionResult> Edit(
+            int id,
+            [Bind("CategoryId,Name")] Category category)
         {
             if (id != category.CategoryId)
             {
@@ -93,7 +109,17 @@ namespace LibrarieOnline.Controllers
             {
                 try
                 {
-                    await _categoryService.UpdateCategory(category);
+                    var existingCategory =
+                        await _categoryService.GetCategoryById(category.CategoryId);
+
+                    if (existingCategory == null)
+                    {
+                        return NotFound();
+                    }
+
+                    existingCategory.Name = category.Name;
+
+                    await _categoryService.UpdateCategory(existingCategory);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -101,10 +127,8 @@ namespace LibrarieOnline.Controllers
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
 
                 return RedirectToAction(nameof(Index));
@@ -113,7 +137,7 @@ namespace LibrarieOnline.Controllers
             return View(category);
         }
 
-        // GET: Categories/Delete/5
+        // Doar Admin poate sterge categorii
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -131,13 +155,11 @@ namespace LibrarieOnline.Controllers
             return View(category);
         }
 
-        // POST: Categories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _categoryService.DeleteCategory(id);
-
             return RedirectToAction(nameof(Index));
         }
     }
