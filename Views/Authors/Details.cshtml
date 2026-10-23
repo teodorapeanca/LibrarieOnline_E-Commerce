@@ -6,40 +6,57 @@
 
 <h1>Cărțile autorului: @Model.Name</h1>
 
-<hr />
-
 <p>
     <strong>Naționalitate:</strong> @Model.Nationality
 </p>
 
-<h3>Cărți scrise de acest autor</h3>
+<hr />
 
 @if (Model.Books != null && Model.Books.Any())
 {
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Titlu carte</th>
-                <th>Acțiuni</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var book in Model.Books)
-            {
-                <tr>
-                    <td>@book.Title</td>
-                    <td>
+    <div class="row">
+        @foreach (var book in Model.Books)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            @book.Title
+                        </h5>
+
+                        <p>
+                            <strong>Preț:</strong>
+                            @book.Price.ToString("0.00") lei
+                        </p>
+
+                        <p style="white-space: pre-line;">
+                            @(string.IsNullOrWhiteSpace(book.Description)
+                                ? "Nu există încă o descriere pentru această carte."
+                                : book.Description)
+                        </p>
+
+                        <p>
+                            <strong>ISBN:</strong>
+                            @(string.IsNullOrWhiteSpace(book.ISBN)
+                                ? "ISBN indisponibil"
+                                : book.ISBN)
+                        </p>
+                    </div>
+
+                    <div class="card-footer bg-white border-0">
                         <a asp-controller="Catalog"
                            asp-action="Detalii"
                            asp-route-id="@book.BookId"
                            class="btn btn-sm btn-info text-white">
                             Vezi cartea
                         </a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                    </div>
+
+                </div>
+            </div>
+        }
+    </div>
 }
 else
 {
@@ -47,16 +64,8 @@ else
 }
 
 <div class="mt-3">
-    @if (User.IsInRole("Admin"))
-    {
-        <a asp-action="Edit"
-           asp-route-id="@Model.AuthorId"
-           class="btn btn-warning">
-            Edit
-        </a>
-    }
-
-    <a asp-action="Index" class="btn btn-secondary">
+    <a asp-action="Index"
+       class="btn btn-secondary">
         Înapoi la autori
     </a>
 </div>

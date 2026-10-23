@@ -1,5 +1,4 @@
-﻿
-@model LibrarieOnline.Models.Publisher
+﻿@model LibrarieOnline.Models.Publisher
 
 @{
     ViewData["Title"] = "Cărțile editurii " + Model.Name;
@@ -23,6 +22,7 @@
         {
             <div class="col-md-4 mb-4">
                 <div class="card h-100 shadow-sm">
+
                     <div class="card-body">
 
                         <h5 class="card-title">
@@ -49,6 +49,16 @@
                         }
 
                     </div>
+
+                    <div class="card-footer bg-white border-0">
+                        <a asp-controller="Catalog"
+                           asp-action="Detalii"
+                           asp-route-id="@book.BookId"
+                           class="btn btn-sm btn-info text-white">
+                            Vezi cartea
+                        </a>
+                    </div>
+
                 </div>
             </div>
         }
@@ -61,6 +71,7 @@ else
     </div>
 }
 
-<a asp-action="Index" class="btn btn-secondary mt-3">
+<a asp-action="Index"
+   class="btn btn-secondary mt-3">
     Înapoi la edituri
 </a>
