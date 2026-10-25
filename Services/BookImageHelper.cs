@@ -49,13 +49,29 @@ namespace LibrarieOnline.Services
                 ["Apus de soare"] = "apusdesoare.jpg",
                 ["Proiecte de trecut"] = "proiectedetrecut.jpg",
                 ["Papillon"] = "papillon.jpg",
-                ["Gestapo"] = "gestapo.jpg"
+                ["Gestapo"] = "gestapo.jpg",
+
+                // Cartile nou adaugate
+                ["Fiica căpitanului"] = "fiicacapitanului.jpg",
+                ["Dama de pică și alte proze"] = "damadepica.jpg",
+                ["Micul prinț"] = "miculprint.jpg",
+                ["Livada de vișini"] = "livadadevisini.jpg",
+                ["Groapa"] = "groapa.jpg",
+                ["Teatru"] = "teatru-lorca.jpg",
+                ["Crimă și pedeapsă"] = "crimasipedeapsa.jpg",
+                ["1984"] = "1984.jpg",
+                ["Părinți și copii"] = "parintisicopii.jpg",
+                ["Mândrie și prejudecată"] = "mandriesiprejudecata.jpg",
+                ["Baltagul"] = "baltagul.jpg",
+                ["Hanu Ancuței. Baltagul"] = "hanuancutei-baltagul.jpg",
+                ["Maitreyi"] = "maitreyi.jpg",
+                ["Doamna Dalloway"] = "doamnadalloway.jpg"
             };
 
         public static string GetImagePath(string? title)
         {
             if (!string.IsNullOrWhiteSpace(title) &&
-                ImageMap.TryGetValue(title, out var imageFile))
+                ImageMap.TryGetValue(title.Trim(), out var imageFile))
             {
                 return "/images/books/" + imageFile;
             }

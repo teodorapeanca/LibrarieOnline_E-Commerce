@@ -156,6 +156,33 @@ namespace LibrarieOnline.Data.Migrations
                     b.ToTable("Books");
                 });
 
+            modelBuilder.Entity("LibrarieOnline.Models.CartItem", b =>
+                {
+                    b.Property<int>("CartItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CartItemId"));
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("CartItemId");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CartItems");
+                });
+
             modelBuilder.Entity("LibrarieOnline.Models.Category", b =>
                 {
                     b.Property<int>("CategoryId")
@@ -189,9 +216,14 @@ namespace LibrarieOnline.Data.Migrations
                     b.Property<int>("BookId")
                         .HasColumnType("int");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("FavoriteId");
 
                     b.HasIndex("BookId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Favorites");
                 });
@@ -436,7 +468,7 @@ namespace LibrarieOnline.Data.Migrations
             modelBuilder.Entity("LibrarieOnline.Models.Book", b =>
                 {
                     b.HasOne("LibrarieOnline.Models.Author", "Author")
-                        .WithMany()
+                        .WithMany("Books")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -460,6 +492,25 @@ namespace LibrarieOnline.Data.Migrations
                     b.Navigation("Publisher");
                 });
 
+            modelBuilder.Entity("LibrarieOnline.Models.CartItem", b =>
+                {
+                    b.HasOne("LibrarieOnline.Models.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LibrarieOnline.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("LibrarieOnline.Models.Favorite", b =>
                 {
                     b.HasOne("LibrarieOnline.Models.Book", "Book")
@@ -468,7 +519,13 @@ namespace LibrarieOnline.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("LibrarieOnline.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
                     b.Navigation("Book");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("LibrarieOnline.Models.OrderItem", b =>
@@ -550,6 +607,11 @@ namespace LibrarieOnline.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("LibrarieOnline.Models.Author", b =>
+                {
+                    b.Navigation("Books");
                 });
 
             modelBuilder.Entity("LibrarieOnline.Models.Book", b =>

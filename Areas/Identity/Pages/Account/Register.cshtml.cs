@@ -1,15 +1,14 @@
-﻿#nullable disable
+﻿
+#nullable disable
 
 using LibrarieOnline.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
-using System.Text.Encodings.Web;
+
 
 namespace LibrarieOnline.Areas.Identity.Pages.Account
 {
@@ -20,21 +19,18 @@ namespace LibrarieOnline.Areas.Identity.Pages.Account
         private readonly IUserStore<ApplicationUser> _userStore;
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
-        private readonly IEmailSender _emailSender;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
-            ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            ILogger<RegisterModel> logger)
         {
             _userManager = userManager;
             _userStore = userStore;
             _emailStore = GetEmailStore();
             _signInManager = signInManager;
             _logger = logger;
-            _emailSender = emailSender;
         }
 
         [BindProperty]
@@ -52,20 +48,26 @@ namespace LibrarieOnline.Areas.Identity.Pages.Account
             public string Email { get; set; }
 
             [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [StringLength(
+                100,
+                ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.",
+                MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
 
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            [Compare(
+                "Password",
+                ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
+
             ExternalLogins =
                 (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
@@ -79,51 +81,73 @@ namespace LibrarieOnline.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
+                // Verificam daca adresa de email este deja folosita.
+                var emailNormalizat = _userManager.NormalizeEmail(Input.Email.Trim());
+
+                bool emailExistent = await _userManager.Users
+                    .AnyAsync(u => u.NormalizedEmail == emailNormalizat);
+
+                if (emailExistent)
+                {
+                    ModelState.AddModelError(
+                        "Input.Email",
+                        "Exista deja un cont inregistrat cu aceasta adresa de email.");
+
+                    return Page();
+                }
+
                 var user = CreateUser();
 
                 user.ProfileImagePath = "/images/profiles/default.png";
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                await _userStore.SetUserNameAsync(
+                    user,
+                    Input.Email,
+                    CancellationToken.None);
 
-                var result = await _userManager.CreateAsync(user, Input.Password);
+                await _emailStore.SetEmailAsync(
+                    user,
+                    Input.Email,
+                    CancellationToken.None);
+
+                var result =
+                    await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, "User");
+                    // Fiecare cont nou primeste rolul User.
+                    var roleResult =
+                        await _userManager.AddToRoleAsync(user, "User");
 
-                    _logger.LogInformation("User created a new account with password.");
-
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
-
-                    await _emailSender.SendEmailAsync(
-                        Input.Email,
-                        "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                    if (!roleResult.Succeeded)
                     {
-                        return RedirectToPage(
-                            "RegisterConfirmation",
-                            new { email = Input.Email, returnUrl = returnUrl });
+                        foreach (var error in roleResult.Errors)
+                        {
+                            ModelState.AddModelError(
+                                string.Empty,
+                                error.Description);
+                        }
+
+                        return Page();
                     }
 
-                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    _logger.LogInformation(
+                        "A fost creat un cont nou cu rolul User.");
+
+                    // Nu trimitem email de confirmare.
+                    // Utilizatorul se autentifica imediat.
+                    await _signInManager.SignInAsync(
+                        user,
+                        isPersistent: false);
+
                     return LocalRedirect(returnUrl);
                 }
 
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    ModelState.AddModelError(
+                        string.Empty,
+                        error.Description);
                 }
             }
 
@@ -147,7 +171,8 @@ namespace LibrarieOnline.Areas.Identity.Pages.Account
         {
             if (!_userManager.SupportsUserEmail)
             {
-                throw new NotSupportedException("The default UI requires a user store with email support.");
+                throw new NotSupportedException(
+                    "The default UI requires a user store with email support.");
             }
 
             return (IUserEmailStore<ApplicationUser>)_userStore;

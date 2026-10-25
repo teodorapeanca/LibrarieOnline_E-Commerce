@@ -1,8 +1,11 @@
-﻿using LibrarieOnline.Models;
+﻿
+using System.Security.Claims;
+using LibrarieOnline.Data;
+using LibrarieOnline.Models;
 using LibrarieOnline.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibrarieOnline.Controllers
 {
@@ -10,28 +13,43 @@ namespace LibrarieOnline.Controllers
     public class CosController : Controller
     {
         private readonly IBookService _bookService;
+        private readonly ApplicationDbContext _context;
 
-        public CosController(IBookService bookService)
+        public CosController(
+            IBookService bookService,
+            ApplicationDbContext context)
         {
             _bookService = bookService;
+            _context = context;
+        }
+
+        private string GetUserId()
+        {
+            return User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? throw new InvalidOperationException(
+                    "Utilizatorul nu este autentificat.");
         }
 
         public async Task<IActionResult> Index()
         {
-            var cart = GetCart();
+            var userId = GetUserId();
+
+            var cart = await _context.CartItems
+                .Where(c => c.UserId == userId)
+                .ToListAsync();
 
             var cartItems = new List<CartItemViewModel>();
 
-            foreach (var group in cart.GroupBy(id => id))
+            foreach (var item in cart)
             {
-                var book = await _bookService.GetBookById(group.Key);
+                var book = await _bookService.GetBookById(item.BookId);
 
                 if (book != null)
                 {
                     cartItems.Add(new CartItemViewModel
                     {
                         Book = book,
-                        Quantity = group.Count()
+                        Quantity = item.Quantity
                     });
                 }
             }
@@ -39,56 +57,104 @@ namespace LibrarieOnline.Controllers
             return View(cartItems);
         }
 
-        public IActionResult AddToCart(int id)
+        public async Task<IActionResult> AddToCart(int id)
         {
-            var cart = GetCart();
+            var userId = GetUserId();
 
-            cart.Add(id);
+            var book = await _bookService.GetBookById(id);
 
-            SaveCart(cart);
+            if (book == null)
+                return NotFound();
+
+            var cartItem = await _context.CartItems
+                .FirstOrDefaultAsync(c =>
+                    c.UserId == userId && c.BookId == id);
+
+            if (cartItem == null)
+            {
+                cartItem = new CartItem
+                {
+                    UserId = userId,
+                    BookId = id,
+                    Quantity = 1
+                };
+
+                _context.CartItems.Add(cartItem);
+            }
+            else
+            {
+                cartItem.Quantity++;
+            }
+
+            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult RemoveFromCart(int id)
+        public async Task<IActionResult> RemoveFromCart(int id)
         {
-            var cart = GetCart();
+            var userId = GetUserId();
 
-            cart.Remove(id);
+            var cartItem = await _context.CartItems
+                .FirstOrDefaultAsync(c =>
+                    c.UserId == userId && c.BookId == id);
 
-            SaveCart(cart);
+            if (cartItem != null)
+            {
+                if (cartItem.Quantity > 1)
+                {
+                    cartItem.Quantity--;
+                }
+                else
+                {
+                    _context.CartItems.Remove(cartItem);
+                }
+
+                await _context.SaveChangesAsync();
+            }
 
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Clear()
+        public async Task<IActionResult> Clear()
         {
-            HttpContext.Session.Remove("Cart");
+            var userId = GetUserId();
+
+            var cartItems = await _context.CartItems
+                .Where(c => c.UserId == userId)
+                .ToListAsync();
+
+            _context.CartItems.RemoveRange(cartItems);
+
+            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult FinalizeazaComanda()
+        public async Task<IActionResult> FinalizeazaComanda()
         {
-            HttpContext.Session.Remove("Cart");
+            var userId = GetUserId();
 
-            TempData["Message"] = "Comanda a fost finalizată cu succes!";
+            var cartItems = await _context.CartItems
+                .Where(c => c.UserId == userId)
+                .ToListAsync();
+
+            if (!cartItems.Any())
+            {
+                TempData["Message"] = "Coșul este gol.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Deocamdata pastram comportamentul existent:
+            // confirmam finalizarea si golim cosul utilizatorului.
+            _context.CartItems.RemoveRange(cartItems);
+
+            await _context.SaveChangesAsync();
+
+            TempData["Message"] =
+                "Comanda a fost finalizată cu succes!";
 
             return RedirectToAction(nameof(Index));
-        }
-
-        private List<int> GetCart()
-        {
-            var cart = HttpContext.Session.GetString("Cart");
-
-            return string.IsNullOrEmpty(cart)
-                ? new List<int>()
-                : JsonSerializer.Deserialize<List<int>>(cart) ?? new List<int>();
-        }
-
-        private void SaveCart(List<int> cart)
-        {
-            HttpContext.Session.SetString("Cart", JsonSerializer.Serialize(cart));
         }
     }
 }

@@ -1,3 +1,4 @@
+
 using LibrarieOnline.Data;
 using LibrarieOnline.Models;
 using LibrarieOnline.Repositories;
@@ -16,8 +17,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // Identity cu ApplicationUser
+// Nu solicitam confirmarea adresei de email.
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
-    options.SignIn.RequireConfirmedAccount = true)
+{
+    options.SignIn.RequireConfirmedAccount = false;
+})
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
@@ -68,7 +72,7 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 
-// Creare roluri + admin automat
+// Configurarea rolurilor utilizatorilor
 using (var scope = app.Services.CreateScope())
 {
     var roleManager =
@@ -83,33 +87,78 @@ using (var scope = app.Services.CreateScope())
     {
         if (!await roleManager.RoleExistsAsync(role))
         {
-            await roleManager.CreateAsync(new IdentityRole(role));
+            var roleResult =
+                await roleManager.CreateAsync(new IdentityRole(role));
+
+            if (!roleResult.Succeeded)
+            {
+                throw new InvalidOperationException(
+                    "Nu s-a putut crea rolul: " + role);
+            }
         }
     }
 
-    string adminEmail = "admin@librarie.ro";
-    string adminPassword = builder.Configuration["SeedAdmin:Password"]
-    ?? throw new InvalidOperationException("Parola administratorului nu este configurata.");
+    // Identificam administratorul dupa ID-ul unic al contului.
+    string? personalAdminUserId =
+        app.Configuration["PersonalAdminUserId"];
 
-    var adminUser = await userManager.FindByEmailAsync(adminEmail);
-
-    if (adminUser == null)
+    if (string.IsNullOrWhiteSpace(personalAdminUserId))
     {
-        adminUser = new ApplicationUser
-        {
-            UserName = adminEmail,
-            Email = adminEmail,
-            EmailConfirmed = true,
-            ProfileImagePath = "/images/profiles/default.png"
-        };
+        throw new InvalidOperationException(
+            "PersonalAdminUserId nu este configurat in appsettings.json.");
+    }
 
-        var result = await userManager.CreateAsync(adminUser, adminPassword);
+    var personalAdmin =
+        await userManager.FindByIdAsync(personalAdminUserId);
 
-        if (result.Succeeded)
+    if (personalAdmin == null)
+    {
+        throw new InvalidOperationException(
+            "Contul administratorului nu exista in baza de date.");
+    }
+
+    // Verificam toate conturile existente.
+    var users = await userManager.Users.ToListAsync();
+
+    foreach (var user in users)
+    {
+        bool isPersonalAdmin = user.Id == personalAdmin.Id;
+
+        string assignedRole = isPersonalAdmin ? "Admin" : "User";
+
+        var currentRoles = await userManager.GetRolesAsync(user);
+
+        // Eliminam doar rolurile care nu sunt corecte.
+        var rolesToRemove = currentRoles
+            .Where(role => role != assignedRole)
+            .ToList();
+
+        if (rolesToRemove.Count > 0)
         {
-            await userManager.AddToRoleAsync(adminUser, "Admin");
+            var removeResult =
+                await userManager.RemoveFromRolesAsync(user, rolesToRemove);
+
+            if (!removeResult.Succeeded)
+            {
+                throw new InvalidOperationException(
+                    "Nu s-au putut actualiza rolurile contului: " + user.Email);
+            }
+        }
+
+        // Adaugam rolul corect numai daca lipseste.
+        if (!await userManager.IsInRoleAsync(user, assignedRole))
+        {
+            var addResult =
+                await userManager.AddToRoleAsync(user, assignedRole);
+
+            if (!addResult.Succeeded)
+            {
+                throw new InvalidOperationException(
+                    "Nu s-a putut atribui rolul pentru: " + user.Email);
+            }
         }
     }
 }
+
 
 app.Run();

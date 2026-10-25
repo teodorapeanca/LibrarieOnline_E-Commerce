@@ -26,5 +26,6 @@ namespace LibrarieOnline.Data
         public DbSet<OrderItem> OrderItems { get; set; }
 
         public DbSet<Favorite> Favorites { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
     }
 }

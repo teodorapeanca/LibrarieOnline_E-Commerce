@@ -8,19 +8,26 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
 
 namespace LibrarieOnline.Areas.Identity.Pages.Account
 {
     public class LoginModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IConfiguration _configuration;
         private readonly ILogger<LoginModel> _logger;
 
         public LoginModel(
-            SignInManager<ApplicationUser> signInManager,
-            ILogger<LoginModel> logger)
+    SignInManager<ApplicationUser> signInManager,
+    UserManager<ApplicationUser> userManager,
+    IConfiguration configuration,
+    ILogger<LoginModel> logger)
         {
             _signInManager = signInManager;
+            _userManager = userManager;
+            _configuration = configuration;
             _logger = logger;
         }
 
@@ -74,8 +81,46 @@ namespace LibrarieOnline.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
+                var email = Input.Email.Trim();
+                var adminId = _configuration["PersonalAdminUserId"];
+
+                ApplicationUser user;
+
+                if (string.Equals(
+                    email,
+                    "teodora.peanca@gmail.com",
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    user = string.IsNullOrWhiteSpace(adminId)
+                        ? null
+                        : await _userManager.FindByIdAsync(adminId);
+
+                    if (user == null ||
+                        !string.Equals(user.Email, email, StringComparison.OrdinalIgnoreCase))
+                    {
+                        ModelState.AddModelError(
+                            string.Empty,
+                            "Contul nu a putut fi identificat.");
+
+                        return Page();
+                    }
+                }
+                else
+                {
+                    user = await _userManager.FindByEmailAsync(email);
+
+                    if (user == null)
+                    {
+                        ModelState.AddModelError(
+                            string.Empty,
+                            "Invalid login attempt.");
+
+                        return Page();
+                    }
+                }
+
                 var result = await _signInManager.PasswordSignInAsync(
-                    Input.Email,
+                    user,
                     Input.Password,
                     Input.RememberMe,
                     lockoutOnFailure: false);
