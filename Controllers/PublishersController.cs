@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LibrarieOnline.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,User")]
     public class PublishersController : Controller
     {
         private readonly IPublisherService _publisherService;
@@ -21,16 +21,14 @@ namespace LibrarieOnline.Controllers
             _bookService = bookService;
         }
 
-        // Lista editurilor - accesibila tuturor
-        [AllowAnonymous]
+        // Admin si User pot vedea lista editurilor
         public async Task<IActionResult> Index()
         {
             var publishers = await _publisherService.GetAllPublishers();
             return View(publishers);
         }
 
-        // Cartile unei edituri - accesibile tuturor
-        [AllowAnonymous]
+        // Admin si User pot vedea cartile unei edituri
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -56,12 +54,14 @@ namespace LibrarieOnline.Controllers
             return View(publisher);
         }
 
-        // Adaugare editura - doar Admin
+        // Doar Admin poate adauga edituri
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
@@ -76,7 +76,8 @@ namespace LibrarieOnline.Controllers
             return View(publisher);
         }
 
-        // Editare editura - doar Admin
+        // Doar Admin poate edita edituri
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -94,6 +95,7 @@ namespace LibrarieOnline.Controllers
             return View(publisher);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
@@ -127,7 +129,8 @@ namespace LibrarieOnline.Controllers
             return View(publisher);
         }
 
-        // Stergere editura - doar Admin
+        // Doar Admin poate sterge edituri
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -145,6 +148,7 @@ namespace LibrarieOnline.Controllers
             return View(publisher);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

@@ -5,6 +5,7 @@ using LibrarieOnline.Repositories;
 using LibrarieOnline.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using ApplicationUser = LibrarieOnline.Models.ApplicationUser;
 
 var builder = WebApplication.CreateBuilder(args);
 

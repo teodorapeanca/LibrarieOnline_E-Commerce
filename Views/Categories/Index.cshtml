@@ -1,4 +1,5 @@
-﻿@model IEnumerable<LibrarieOnline.Models.Category>
+﻿
+@model IEnumerable<LibrarieOnline.Models.Category>
 
 @{
     ViewData["Title"] = "Categorii";
@@ -9,13 +10,14 @@
 @if (User.IsInRole("Admin"))
 {
     <p>
-        <a asp-action="Create" class="btn btn-primary">
+        <a asp-action="Create"
+           class="btn btn-primary">
             Adaugă categorie
         </a>
     </p>
 }
 
-<table class="table">
+<table class="table table-bordered table-hover bg-white">
     <thead>
         <tr>
             <th>Nume categorie</th>
@@ -27,12 +29,19 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>
-                    @item.Name
-                </td>
+                <td>@item.Name</td>
 
                 <td>
-                    <div class="d-flex gap-2">
+                    <div class="d-flex gap-2 flex-wrap">
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit"
+                               asp-route-id="@item.CategoryId"
+                               class="btn btn-sm btn-warning">
+                                Editează
+                            </a>
+                        }
 
                         <a asp-action="Details"
                            asp-route-id="@item.CategoryId"
@@ -42,12 +51,6 @@
 
                         @if (User.IsInRole("Admin"))
                         {
-                            <a asp-action="Edit"
-                               asp-route-id="@item.CategoryId"
-                               class="btn btn-sm btn-warning">
-                                Editează
-                            </a>
-
                             <a asp-action="Delete"
                                asp-route-id="@item.CategoryId"
                                class="btn btn-sm btn-danger">

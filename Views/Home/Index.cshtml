@@ -1,8 +1,215 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿
+@{
+    ViewData["Title"] = "Acasă";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<style>
+    .home-hero {
+        background: linear-gradient(135deg, #3b2922, #80583d);
+        color: white;
+        border-radius: 18px;
+        padding: 75px 35px;
+        text-align: center;
+        margin-bottom: 45px;
+    }
+
+    .home-hero h1 {
+        font-size: 2.8rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .home-hero p {
+        font-size: 1.15rem;
+        max-width: 650px;
+        margin: 0 auto 30px;
+        line-height: 1.8;
+    }
+
+    .home-section-title {
+        font-weight: 700;
+        margin-bottom: 25px;
+        text-align: center;
+        color: #3b2922;
+    }
+
+    .home-feature-card {
+        border: 1px solid #e7e0da;
+        border-radius: 14px;
+        padding: 30px 20px;
+        height: 100%;
+        background: #fff;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .home-feature-icon {
+        font-size: 2.4rem;
+        margin-bottom: 15px;
+    }
+
+    .home-feature-card h4 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+    }
+
+    .home-feature-card p {
+        color: #666;
+        line-height: 1.7;
+    }
+
+    .home-category-card {
+        background: #f5f0ea;
+        border-radius: 14px;
+        padding: 30px 20px;
+        text-align: center;
+        height: 100%;
+    }
+
+    .home-category-card h4 {
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .home-bottom {
+        text-align: center;
+        padding: 45px 20px;
+        background: #f8f6f3;
+        border-radius: 15px;
+        margin-top: 45px;
+        margin-bottom: 30px;
+    }
+</style>
+
+<section class="home-hero">
+    <h1>Bine ai venit la Librărie Online!</h1>
+
+    <p>
+        Descoperă povești captivante, autori consacrați și cărți
+        din numeroase domenii. Explorează colecția noastră și
+        găsește următoarea ta lectură preferată.
+    </p>
+
+    <a asp-controller="Catalog"
+       asp-action="Index"
+       class="btn btn-warning btn-lg px-4">
+        Explorează catalogul
+    </a>
+</section>
+
+<section class="mb-5">
+    <h2 class="home-section-title">
+        Ce poți descoperi în librăria noastră?
+    </h2>
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="home-feature-card">
+                <div class="home-feature-icon">📚</div>
+
+                <h4>Catalog de cărți</h4>
+
+                <p>
+                    Explorează titluri din diferite categorii,
+                    consultă descrierile și descoperă
+                    informații despre fiecare carte.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="home-feature-card">
+                <div class="home-feature-icon">✍️</div>
+
+                <h4>Autori și edituri</h4>
+
+                <p>
+                    Descoperă autorii preferați, editurile
+                    disponibile și cărțile asociate acestora.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="home-feature-card">
+                <div class="home-feature-icon">❤️</div>
+
+                <h4>Favorite și comenzi</h4>
+
+                <p>
+                    Utilizatorii autentificați pot salva
+                    cărțile preferate, le pot adăuga în coș
+                    și pot plasa comenzi.
+                </p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<section class="mb-5">
+    <h2 class="home-section-title">
+        Explorează universul cărților
+    </h2>
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="home-category-card">
+                <div style="font-size: 2.5rem;">📖</div>
+                <h4>Literatură</h4>
+                <p>
+                    Romane clasice, povești memorabile
+                    și opere ale marilor scriitori.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="home-category-card">
+                <div style="font-size: 2.5rem;">🧠</div>
+                <h4>Filosofie</h4>
+                <p>
+                    Idei, reflecții și cărți care
+                    te invită să privești lumea diferit.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="home-category-card">
+                <div style="font-size: 2.5rem;">🌍</div>
+                <h4>Istorie și cultură</h4>
+                <p>
+                    Descoperă epoci, civilizații
+                    și perspective asupra trecutului.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="text-center mt-4">
+        <a asp-controller="Categories"
+           asp-action="Index"
+           class="btn btn-outline-dark">
+            Vezi toate categoriile
+        </a>
+    </div>
+</section>
+
+<section class="home-bottom">
+    <h2>Următoarea ta carte preferată te așteaptă!</h2>
+
+    <p class="mt-3 mb-4">
+        Răsfoiește catalogul și descoperă o nouă poveste.
+    </p>
+
+    <a asp-controller="Catalog"
+       asp-action="Index"
+       class="btn btn-warning btn-lg">
+        Descoperă cărțile
+    </a>
+</section>

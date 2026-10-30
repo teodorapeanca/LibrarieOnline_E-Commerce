@@ -1,4 +1,5 @@
-﻿@model LibrarieOnline.Models.Publisher
+﻿
+@model LibrarieOnline.Models.Publisher
 
 @{
     ViewData["Title"] = "Cărțile editurii " + Model.Name;
@@ -6,6 +7,38 @@
     var books = ViewBag.PublisherBooks as List<LibrarieOnline.Models.Book>
                 ?? new List<LibrarieOnline.Models.Book>();
 }
+
+<style>
+    .catalog-image-container {
+        position: relative;
+        width: 100%;
+        height: 300px;
+        overflow: hidden;
+        background-color: #e9ecef;
+    }
+
+    .catalog-image-background {
+        position: absolute;
+        top: -20px;
+        left: -20px;
+        width: calc(100% + 40px);
+        height: calc(100% + 40px);
+        object-fit: cover;
+        object-position: center;
+        filter: blur(18px) brightness(0.75);
+        transform: scale(1.1);
+    }
+
+    .catalog-image-main {
+        position: relative;
+        z-index: 1;
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center;
+    }
+</style>
 
 <h1>Cărțile editurii: @Model.Name</h1>
 
@@ -20,12 +53,27 @@
     <div class="row">
         @foreach (var book in books)
         {
+            var imagePath = LibrarieOnline.Services.BookImageHelper.GetImagePath(book.Title);
+
             <div class="col-md-4 mb-4">
                 <div class="card h-100 shadow-sm">
 
+                    <div class="catalog-image-container">
+
+                        <img src="@imagePath"
+                             class="catalog-image-background"
+                             alt=""
+                             aria-hidden="true" />
+
+                        <img src="@imagePath"
+                             class="catalog-image-main"
+                             alt="Coperta cărții @book.Title" />
+
+                    </div>
+
                     <div class="card-body">
 
-                        <h5 class="card-title">
+                        <h5 class="card-title fw-bold">
                             @book.Title
                         </h5>
 
@@ -36,7 +84,8 @@
 
                         @if (!string.IsNullOrWhiteSpace(book.Description))
                         {
-                            <p class="card-text">
+                            <p class="card-text"
+                               style="white-space: pre-line;">
                                 @book.Description
                             </p>
                         }

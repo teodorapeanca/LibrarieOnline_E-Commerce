@@ -5,7 +5,8 @@
 <html lang="ro">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
 
     <title>@ViewData["Title"] - Librărie Online</title>
 
@@ -18,7 +19,6 @@
 </head>
 
 <body>
-
     <header class="sticky-top">
         <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
 
@@ -85,21 +85,25 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark"
-                               asp-controller="Cos"
-                               asp-action="Index">
-                                Coș
-                            </a>
-                        </li>
+                        @* Coș și Favorite sunt ascunse pentru Admin *@
+                        @if (!User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-controller="Cos"
+                                   asp-action="Index">
+                                    Coș
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark"
-                               asp-controller="Favorites"
-                               asp-action="Index">
-                                ❤ Favorite
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-controller="Favorites"
+                                   asp-action="Index">
+                                    ❤ Favorite
+                                </a>
+                            </li>
+                        }
 
                     </ul>
 
@@ -111,11 +115,9 @@
     </header>
 
     <div class="container">
-
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
-
     </div>
 
     <footer class="border-top footer text-muted">

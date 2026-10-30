@@ -1,4 +1,5 @@
-﻿@model LibrarieOnline.Models.Category
+﻿
+@model LibrarieOnline.Models.Category
 
 @{
     ViewData["Title"] = "Cărți din categoria " + Model.Name;
@@ -7,7 +8,40 @@
                 ?? new List<LibrarieOnline.Models.Book>();
 }
 
+<style>
+    .catalog-image-container {
+        position: relative;
+        width: 100%;
+        height: 300px;
+        overflow: hidden;
+        background-color: #e9ecef;
+    }
+
+    .catalog-image-background {
+        position: absolute;
+        top: -20px;
+        left: -20px;
+        width: calc(100% + 40px);
+        height: calc(100% + 40px);
+        object-fit: cover;
+        object-position: center;
+        filter: blur(18px) brightness(0.75);
+        transform: scale(1.1);
+    }
+
+    .catalog-image-main {
+        position: relative;
+        z-index: 1;
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center;
+    }
+</style>
+
 <h1>Cărți din categoria: @Model.Name</h1>
+
 <hr />
 
 @if (books.Any())
@@ -15,11 +49,29 @@
     <div class="row">
         @foreach (var book in books)
         {
+            var imagePath = LibrarieOnline.Services.BookImageHelper.GetImagePath(book.Title);
+
             <div class="col-md-4 mb-4">
                 <div class="card h-100 shadow-sm">
 
+                    <div class="catalog-image-container">
+
+                        <img src="@imagePath"
+                             class="catalog-image-background"
+                             alt=""
+                             aria-hidden="true" />
+
+                        <img src="@imagePath"
+                             class="catalog-image-main"
+                             alt="Coperta cărții @book.Title" />
+
+                    </div>
+
                     <div class="card-body">
-                        <h5 class="card-title">@book.Title</h5>
+
+                        <h5 class="card-title fw-bold">
+                            @book.Title
+                        </h5>
 
                         <p class="card-text">
                             <strong>Preț:</strong>
@@ -28,7 +80,8 @@
 
                         @if (!string.IsNullOrWhiteSpace(book.Description))
                         {
-                            <p class="card-text">
+                            <p class="card-text"
+                               style="white-space: pre-line;">
                                 @book.Description
                             </p>
                         }
@@ -39,6 +92,7 @@
                                 <strong>ISBN:</strong> @book.ISBN
                             </p>
                         }
+
                     </div>
 
                     <div class="card-footer bg-white border-0">

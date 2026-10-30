@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LibrarieOnline.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,User")]
     public class CategoriesController : Controller
     {
         private readonly ICategoryService _categoryService;
@@ -21,16 +21,14 @@ namespace LibrarieOnline.Controllers
             _bookService = bookService;
         }
 
-        // Toata lumea poate vedea categoriile
-        [AllowAnonymous]
+        // Admin si User pot vedea categoriile
         public async Task<IActionResult> Index()
         {
             var categories = await _categoryService.GetAllCategories();
             return View(categories);
         }
 
-        // Toata lumea poate vedea cartile unei categorii
-        [AllowAnonymous]
+        // Admin si User pot vedea cartile unei categorii
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -57,11 +55,13 @@ namespace LibrarieOnline.Controllers
         }
 
         // Doar Admin poate crea categorii
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
@@ -77,6 +77,7 @@ namespace LibrarieOnline.Controllers
         }
 
         // Doar Admin poate edita categorii
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -94,6 +95,7 @@ namespace LibrarieOnline.Controllers
             return View(category);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
@@ -138,6 +140,7 @@ namespace LibrarieOnline.Controllers
         }
 
         // Doar Admin poate sterge categorii
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -155,6 +158,7 @@ namespace LibrarieOnline.Controllers
             return View(category);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
