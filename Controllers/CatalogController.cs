@@ -12,9 +12,11 @@ namespace LibrarieOnline.Controllers
             _bookService = bookService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id)
         {
             var books = await _bookService.GetAllBooks();
+
+            ViewBag.SelectedBookId = id;
 
             return View(books);
         }

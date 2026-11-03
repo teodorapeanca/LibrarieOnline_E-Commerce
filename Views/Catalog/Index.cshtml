@@ -3,6 +3,10 @@
 @{
     ViewData["Title"] = "Catalog";
 }
+.carte-catalog:target .card {
+border: 3px solid #ffc107;
+box-shadow: 0 0 15px rgba(255, 193, 7, 0.5) !important;
+}
 
 <style>
     /* Zona imaginilor din catalog */
@@ -60,7 +64,8 @@
         var imagePath = LibrarieOnline.Services.BookImageHelper.GetImagePath(item.Title);
 
         <div class="col-md-4 mb-4 carte-catalog"
-             id="carte-@item.BookId">
+             id="carte-@item.BookId"
+             style="scroll-margin-top: 100px;">
 
             <div class="card h-100 shadow-sm">
 

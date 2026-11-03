@@ -97,10 +97,10 @@
 
                     <div class="card-footer bg-white border-0">
                         <a asp-controller="Catalog"
-                           asp-action="Detalii"
-                           asp-route-id="@book.BookId"
+                           asp-action="Index"
+                           asp-fragment="carte-@book.BookId"
                            class="btn btn-sm btn-info text-white">
-                            Vezi cartea
+                            Vezi în catalog
                         </a>
                     </div>
 
